@@ -16,7 +16,7 @@ pub fn handler(program_id: &Pubkey, accounts: &[AccountInfo]) -> Result<(), Regi
     let entity_acc_info = next_account_info(acc_infos)?;
     let registrar_acc_info = next_account_info(acc_infos)?;
 
-    let pool = &Pool::parse_accounts(PoolConfig::GetBasket, acc_infos)?;
+    let pool = &Pool::parse_accounts(acc_infos, PoolConfig::GetBasket)?;
 
     let AccessControlResponse { ref entity } = access_control(AccessControlRequest {
         generation_acc_info,

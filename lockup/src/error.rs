@@ -70,6 +70,9 @@ pub enum LockupErrorCode {
     WhitelistEntryAlreadyExists = 57,
     WhitelistSafeMismatch = 58,
     InsufficientAmount = 59,
+    VestingNotActivated = 60,
+    AlreadyAssigned = 61,
+    AssignmentAuthMismatch = 62,
     Unknown = 1000,
 }
 

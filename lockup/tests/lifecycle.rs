@@ -57,6 +57,7 @@ fn lifecycle() {
                 end_ts,
                 period_count,
                 deposit_amount,
+                needs_assignment: None,
             })
             .unwrap();
 

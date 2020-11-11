@@ -62,7 +62,7 @@ pub mod instruction {
         /// 2. `[]`         Entity to join.
         /// 3. `[]`         Registrar.
         /// 4. `[]`         Rent sysvar.
-        CreateMember { delegate: Pubkey },
+        CreateMember { delegate: Pubkey, nonce: u8 },
         /// Accounts:
         ///
         /// 0. `[writable]` Member.
@@ -168,6 +168,14 @@ pub mod instruction {
         /// 4. `[]`         Registrar.
         /// 5. `[]`         Clock.
         EndStakeWithdrawal,
+        /// Accounts:
+        ///
+        /// 0. `[]          Member.
+        /// 1. `[]`         Entity.
+        /// 2. `[]`         Registrar.
+        /// 3. `[]`         Lockup program.
+        /// 4. `[writable]` Vesting.
+        AssignVesting,
         /// Accounts:
         ///
         /// 0. `[signer]`   Registrar authority.

@@ -115,6 +115,7 @@ fn lifecycle() {
                 end_ts: current_ts + 60,
                 period_count: 10,
                 deposit_amount,
+                needs_assignment: None,
             })
             .unwrap();
         // Claim vesting.

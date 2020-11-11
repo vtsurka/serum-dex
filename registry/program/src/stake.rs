@@ -28,14 +28,14 @@ pub fn handler(
     let clock_acc_info = next_account_info(acc_infos)?;
     let token_program_acc_info = next_account_info(acc_infos)?;
 
-    let ref pool = {
-        let cfg = PoolConfig::Execute {
+    let ref pool = Pool::parse_accounts(
+        acc_infos,
+        PoolConfig::Execute {
             registrar_acc_info,
             token_program_acc_info,
             is_create: true,
-        };
-        Pool::parse_accounts(cfg, acc_infos)?
-    };
+        },
+    )?;
 
     let ctx = EntityContext {
         entity_acc_info,

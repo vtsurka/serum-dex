@@ -33,7 +33,7 @@ pub fn handler(
     let clock_acc_info = next_account_info(acc_infos)?;
     let vault_acc_info = next_account_info(acc_infos)?;
 
-    let pool = &Pool::parse_accounts(PoolConfig::GetBasket, acc_infos)?;
+    let pool = &Pool::parse_accounts(acc_infos, PoolConfig::GetBasket)?;
 
     let ctx = EntityContext {
         registrar_acc_info,

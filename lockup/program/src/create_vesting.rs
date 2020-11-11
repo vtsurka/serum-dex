@@ -1,6 +1,6 @@
 use crate::access_control;
 use serum_common::pack::Pack;
-use serum_lockup::accounts::{TokenVault, Vesting};
+use serum_lockup::accounts::{NeedsAssignment, TokenVault, Vesting};
 use serum_lockup::error::{LockupError, LockupErrorCode};
 use solana_program::info;
 use solana_sdk::account_info::{next_account_info, AccountInfo};
@@ -15,6 +15,7 @@ pub fn handler(
     end_ts: i64,
     period_count: u64,
     deposit_amount: u64,
+    needs_assignment: Option<NeedsAssignment>,
 ) -> Result<(), LockupError> {
     info!("handler: create_vesting");
 
@@ -63,6 +64,7 @@ pub fn handler(
                 vault_acc_info,
                 depositor_authority_acc_info,
                 token_program_acc_info,
+                needs_assignment: needs_assignment.clone(),
             })
             .map_err(Into::into)
         },
@@ -173,6 +175,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), LockupError> {
         vault_acc_info,
         depositor_authority_acc_info,
         token_program_acc_info,
+        needs_assignment,
     } = req;
 
     // Initialize account.
@@ -188,6 +191,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), LockupError> {
         vesting_acc.balance = deposit_amount;
         vesting_acc.locked_nft_mint = *nft_mint_acc_info.key;
         vesting_acc.whitelist_owned = 0;
+        vesting_acc.needs_assignment = needs_assignment;
     }
 
     // Now transfer SPL funds from the depositor, to the
@@ -247,4 +251,5 @@ struct StateTransitionRequest<'a, 'b, 'c> {
     depositor_authority_acc_info: &'a AccountInfo<'b>,
     token_program_acc_info: &'a AccountInfo<'b>,
     nft_mint_acc_info: &'a AccountInfo<'b>,
+    needs_assignment: Option<NeedsAssignment>,
 }

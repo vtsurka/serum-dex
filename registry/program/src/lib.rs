@@ -7,6 +7,7 @@ use solana_sdk::account_info::AccountInfo;
 use solana_sdk::entrypoint::ProgramResult;
 use solana_sdk::pubkey::Pubkey;
 
+//mod assign_vesting;
 mod common;
 mod create_entity;
 mod create_member;
@@ -67,8 +68,8 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
         RegistryInstruction::UpdateEntity { leader } => {
             update_entity::handler(program_id, accounts, leader)
         }
-        RegistryInstruction::CreateMember { delegate } => {
-            create_member::handler(program_id, accounts, delegate)
+        RegistryInstruction::CreateMember { delegate, nonce } => {
+            create_member::handler(program_id, accounts, delegate, nonce)
         }
         RegistryInstruction::UpdateMember { delegate } => {
             update_member::handler(program_id, accounts, delegate)
@@ -84,6 +85,7 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
         RegistryInstruction::EndStakeWithdrawal => {
             end_stake_withdrawal::handler(program_id, accounts)
         }
+        //        RegistryInstruction::AssignVesting => assign_vesting::handler(program_id, accounts),
         RegistryInstruction::Slash { amount } => slash::handler(program_id, accounts, amount),
     };
 

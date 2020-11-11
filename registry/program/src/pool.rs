@@ -44,8 +44,8 @@ impl<'a, 'b> Pool<'a, 'b> {
     }
 
     pub fn parse_accounts(
-        cfg: PoolConfig<'a, 'b>,
         acc_infos: &mut dyn std::iter::Iterator<Item = &'a AccountInfo<'b>>,
+        cfg: PoolConfig<'a, 'b>,
     ) -> Result<Self, RegistryError> {
         let acc_infos = acc_infos.collect::<Vec<_>>();
         let is_mega = match acc_infos.len() {

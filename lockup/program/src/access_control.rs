@@ -56,6 +56,20 @@ pub fn vesting(
     vesting_acc_info: &AccountInfo,
     vesting_acc_beneficiary_info: &AccountInfo,
 ) -> Result<Vesting, LockupError> {
+    let vesting = vesting_raw(program_id, safe, vesting_acc_info)?;
+
+    if vesting.beneficiary != *vesting_acc_beneficiary_info.key {
+        return Err(LockupErrorCode::Unauthorized)?;
+    }
+
+    Ok(vesting)
+}
+
+pub fn vesting_raw(
+    program_id: &Pubkey,
+    safe: &Pubkey,
+    vesting_acc_info: &AccountInfo,
+) -> Result<Vesting, LockupError> {
     let vesting = Vesting::unpack(&vesting_acc_info.try_borrow_data()?)?;
 
     if vesting_acc_info.owner != program_id {
@@ -64,13 +78,9 @@ pub fn vesting(
     if !vesting.initialized {
         return Err(LockupErrorCode::NotInitialized)?;
     }
-    if vesting.beneficiary != *vesting_acc_beneficiary_info.key {
-        return Err(LockupErrorCode::Unauthorized)?;
-    }
     if vesting.safe != *safe {
         return Err(LockupErrorCode::WrongSafe)?;
     }
-
     Ok(vesting)
 }
 

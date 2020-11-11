@@ -332,8 +332,10 @@ pub fn create_member_derived(
         AccountMeta::new_readonly(solana_sdk::sysvar::rent::ID, false),
     ];
 
+    let (_, nonce) =
+        Pubkey::find_program_address(&[beneficiary.pubkey().as_ref()], client.program());
     let member_instr =
-        serum_registry::instruction::create_member(*client.program(), &accounts, delegate);
+        serum_registry::instruction::create_member(*client.program(), &accounts, delegate, nonce);
 
     let instructions = [create_acc_instr, member_instr];
     let signers = [client.payer(), beneficiary];

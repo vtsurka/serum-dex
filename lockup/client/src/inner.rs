@@ -1,7 +1,7 @@
 use crate::InitializeResponse;
 use serum_common::client::rpc;
 use serum_common::pack::Pack;
-use serum_lockup::accounts::{Safe, Whitelist};
+use serum_lockup::accounts::{NeedsAssignment, Safe, Whitelist};
 use serum_lockup::client::{Client as InnerClient, ClientError as InnerClientError};
 use solana_client_gen::prelude::*;
 use solana_client_gen::solana_sdk;
@@ -127,6 +127,7 @@ pub fn create_vesting_account(
     period_count: u64,
     deposit_amount: u64,
     mint_decimals: u8,
+    needs_assignment: Option<NeedsAssignment>,
 ) -> Result<(Signature, Keypair, Pubkey), InnerClientError> {
     let mint_kp = Keypair::generate(&mut OsRng);
 
@@ -173,6 +174,7 @@ pub fn create_vesting_account(
         end_ts,
         period_count,
         deposit_amount,
+        needs_assignment,
     );
 
     let instructions = [create_account_instr, create_vesting_instr];

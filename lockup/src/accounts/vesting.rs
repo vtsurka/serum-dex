@@ -9,18 +9,39 @@ lazy_static::lazy_static! {
                 .expect("Vesting has a fixed size");
 }
 
-/// The Vesting account represents a single deposit of a token
+/// The Vesting account represents a single deposit of tokens
 /// available for withdrawal over a period of time determined by
 /// a vesting schedule.
+///
+/// There are three steps to this vesting account becoming available.
+/// It must be
+///
+/// 1. Initialized with a deposit (by anyone).
+/// 2. Marked claimable by a claim authority (e.g. staking program).
+/// 3. Claimed by the Vesting beneficiary.
+///
 #[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
 pub struct Vesting {
     /// True iff the vesting account has been initialized via deposit.
     pub initialized: bool,
+    /// If Some, defines the key whose signature is required to invoke the
+    /// `Assign` instruction.
+    ///
+    /// This is used for the registry program to set a beneficiary
+    /// for a locked SRM vesting account upon stake withdrawal. Although
+    /// rewards can be dropped on the pool at any time, it's desired for
+    /// locked SRM rewards to be unattainable until stake is fully withdrawn.
+    ///
+    /// This mechanism allows us to not only create a locked SRM vesting
+    /// account, but also for that vesting account to be unusable *and*
+    /// unassignable until the stake is withdrawn.
+    pub needs_assignment: Option<NeedsAssignment>,
     /// One time token for claiming the vesting account.
     pub claimed: bool,
     /// The Safe instance this account is associated with.
     pub safe: Pubkey,
-    /// The effective owner of this Vesting account.
+    /// The intended owner of this Vesting account. Used only as a marker
+    /// unless the claim_lock has been released. That is, if th
     pub beneficiary: Pubkey,
     /// The outstanding SRM deposit backing this vesting account. All
     /// withdrawals/redemptions will deduct this balance.
@@ -43,6 +64,16 @@ pub struct Vesting {
     pub locked_nft_token: Pubkey,
     /// The amount of tokens in custody of whitelisted programs.
     pub whitelist_owned: u64,
+}
+
+#[derive(Clone, Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
+pub struct NeedsAssignment {
+    // Program derived address that can invoke the `Assign` instruction.
+    pub authority: Pubkey,
+    // Program id for the authority.
+    pub program_id: Pubkey,
+    // Nonce for the authority.
+    pub nonce: u8,
 }
 
 impl Vesting {

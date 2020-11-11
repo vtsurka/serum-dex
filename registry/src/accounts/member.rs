@@ -31,6 +31,8 @@ pub struct Member {
     /// pool token when a withdrawal on an inactive entity happens *and*
     /// no `Generation` is provided to the stake withdrawal instruction.
     pub last_active_prices: PoolPrices,
+    /// Signer nonce.
+    pub nonce: u8,
 }
 
 impl Member {
@@ -231,6 +233,10 @@ impl MemberBalances {
             main: OriginalDeposit::new(beneficiary),
             delegate: OriginalDeposit::new(delegate),
         }
+    }
+
+    pub fn stake_is_empty(&self) -> bool {
+        self.spt_amount + self.spt_mega_amount == 0
     }
 }
 

@@ -1,7 +1,9 @@
 use anyhow::anyhow;
 use serum_common::client::rpc;
 use serum_common::pack::*;
-use serum_lockup::accounts::{Safe, TokenVault, Vesting, Whitelist, WhitelistEntry};
+use serum_lockup::accounts::{
+    NeedsAssignment, Safe, TokenVault, Vesting, Whitelist, WhitelistEntry,
+};
 use serum_lockup::client::{Client as InnerClient, ClientError as InnerClientError};
 use serum_lockup::error::LockupError;
 use serum_registry::client::Client as RegistryClientInner;
@@ -51,6 +53,7 @@ impl Client {
             req.period_count,
             req.deposit_amount,
             mint_decimals,
+            req.needs_assignment,
         )
         .map_err(Into::into)
         .map(|r| CreateVestingResponse {
@@ -530,6 +533,7 @@ pub struct CreateVestingRequest<'a> {
     pub end_ts: i64,
     pub period_count: u64,
     pub deposit_amount: u64,
+    pub needs_assignment: Option<NeedsAssignment>,
 }
 
 #[derive(Debug)]

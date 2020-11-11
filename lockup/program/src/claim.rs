@@ -90,6 +90,9 @@ fn access_control(req: AccessControlRequest) -> Result<(), LockupError> {
     )?;
 
     // Claim checks.
+    if vesting.needs_assignment.is_some() {
+        return Err(LockupErrorCode::VestingNotActivated)?;
+    }
     if vesting.claimed {
         return Err(LockupErrorCode::AlreadyClaimed)?;
     }

@@ -5,12 +5,12 @@
 use serum_common::pack::Pack;
 use serum_lockup::error::{LockupError, LockupErrorCode};
 use serum_lockup::instruction::LockupInstruction;
-use solana_program::info;
 use solana_sdk::account_info::AccountInfo;
 use solana_sdk::entrypoint::ProgramResult;
 use solana_sdk::pubkey::Pubkey;
 
 pub(crate) mod access_control;
+mod assign;
 mod claim;
 mod create_vesting;
 mod initialize;
@@ -36,6 +36,7 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
             end_ts,
             period_count,
             deposit_amount,
+            activated,
         } => create_vesting::handler(
             program_id,
             accounts,
@@ -43,7 +44,11 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
             end_ts,
             period_count,
             deposit_amount,
+            activated,
         ),
+        LockupInstruction::Assign { beneficiary } => {
+            assign::handler(program_id, accounts, beneficiary)
+        }
         LockupInstruction::Claim => claim::handler(program_id, accounts),
         LockupInstruction::Redeem { amount } => redeem::handler(program_id, accounts, amount),
         LockupInstruction::WhitelistWithdraw {
