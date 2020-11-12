@@ -6,6 +6,7 @@ use solana_program::info;
 use solana_sdk::account_info::{next_account_info, AccountInfo};
 use solana_sdk::pubkey::Pubkey;
 
+#[inline(never)]
 pub fn handler(
     program_id: &Pubkey,
     accounts: &[AccountInfo],

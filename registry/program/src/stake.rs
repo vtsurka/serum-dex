@@ -12,6 +12,7 @@ use solana_sdk::sysvar::clock::Clock;
 use spl_token::instruction as token_instruction;
 use spl_token::state::Account as TokenAccount;
 
+#[inline(never)]
 pub fn handler(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
