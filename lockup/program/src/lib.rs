@@ -36,7 +36,7 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
             end_ts,
             period_count,
             deposit_amount,
-            activated,
+            needs_assignment,
         } => create_vesting::handler(
             program_id,
             accounts,
@@ -44,7 +44,7 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
             end_ts,
             period_count,
             deposit_amount,
-            activated,
+            needs_assignment,
         ),
         LockupInstruction::Assign { beneficiary } => {
             assign::handler(program_id, accounts, beneficiary)

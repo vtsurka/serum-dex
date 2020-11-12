@@ -88,6 +88,7 @@ pub fn deposit_with_schedule(
                 end_ts,
                 period_count,
                 deposit_amount,
+                needs_assignment: None,
             })
             .unwrap();
 
