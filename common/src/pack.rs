@@ -12,7 +12,16 @@ pub use solana_sdk::program_error::ProgramError;
 pub trait Pack: std::marker::Sized + std::fmt::Debug {
     /// Serializes `src` into `dst`. The size of the serialization and
     /// dst must be equal.
-    fn pack(src: Self, dst: &mut [u8]) -> Result<(), ProgramError>;
+    fn pack(src: Self, dst: &mut [u8]) -> Result<(), ProgramError> {
+        if src.size()? != dst.len() as u64 {
+            #[cfg(feature = "program")]
+            solana_sdk::info!("pack size mismatch");
+            return Err(ProgramError::InvalidAccountData);
+        }
+        Pack::pack_unchecked(src, dst)
+    }
+
+    fn pack_unchecked(src: Self, dst: &mut [u8]) -> Result<(), ProgramError>;
 
     /// Deserializes `src` into Self. The deserialized object need not
     /// use all the bytes in `src` and should mutated the slice so that
@@ -61,7 +70,7 @@ pub trait Pack: std::marker::Sized + std::fmt::Debug {
     {
         let mut t = Self::unpack_unchecked(&mut input.as_ref())?;
         let u = f(&mut t)?;
-        Self::pack(t, input)?;
+        Self::pack_unchecked(t, input)?;
         Ok(u)
     }
 }
@@ -76,12 +85,7 @@ pub trait Pack: std::marker::Sized + std::fmt::Debug {
 macro_rules! packable {
     ($my_struct:ty) => {
         impl Pack for $my_struct {
-            fn pack(src: $my_struct, dst: &mut [u8]) -> Result<(), ProgramError> {
-                if src.size()? != dst.len() as u64 {
-                    #[cfg(feature = "program")]
-                    solana_sdk::info!("pack size mismatch");
-                    return Err(ProgramError::InvalidAccountData);
-                }
+            fn pack_unchecked(src: $my_struct, dst: &mut [u8]) -> Result<(), ProgramError> {
                 serum_common::pack::into_bytes(&src, dst)
             }
 

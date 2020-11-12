@@ -143,7 +143,6 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), LockupError> {
 
     // Burn the NFT.
     {
-        info!("burning token receipts");
         let burn_instruction = spl_token::instruction::burn(
             &spl_token::ID,
             nft_token_acc_info.key,
@@ -157,7 +156,6 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), LockupError> {
 
     // Transfer token from the vault to the user address.
     {
-        info!("invoking token transfer");
         let withdraw_instruction = spl_token::instruction::transfer(
             &spl_token::ID,
             safe_vault_acc_info.key,

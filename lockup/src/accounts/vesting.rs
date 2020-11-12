@@ -9,7 +9,7 @@ lazy_static::lazy_static! {
                 .expect("Vesting has a fixed size");
 }
 
-#[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
+#[derive(Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
 pub struct Vesting {
     /// True iff the vesting account has been initialized via deposit.
     pub initialized: bool,
@@ -53,6 +53,26 @@ pub struct Vesting {
     pub locked_nft_token: Pubkey,
     /// The amount of tokens in custody of whitelisted programs.
     pub whitelist_owned: u64,
+}
+
+impl Default for Vesting {
+    fn default() -> Vesting {
+        Vesting {
+            initialized: false,
+            needs_assignment: Some(Default::default()),
+            claimed: false,
+            safe: Pubkey::new_from_array([0; 32]),
+            beneficiary: Pubkey::new_from_array([0; 32]),
+            balance: 0,
+            start_balance: 0,
+            start_ts: 0,
+            end_ts: 0,
+            period_count: 0,
+            locked_nft_mint: Pubkey::new_from_array([0; 32]),
+            locked_nft_token: Pubkey::new_from_array([0; 32]),
+            whitelist_owned: 0,
+        }
+    }
 }
 
 #[derive(Clone, Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]

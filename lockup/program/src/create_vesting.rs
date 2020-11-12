@@ -48,7 +48,7 @@ pub fn handler(
         clock_ts,
     })?;
 
-    Vesting::unpack_mut(
+    Vesting::unpack_unchecked_mut(
         &mut vesting_acc_info.try_borrow_mut_data()?,
         &mut |vesting_acc: &mut Vesting| {
             state_transition(StateTransitionRequest {
@@ -110,7 +110,8 @@ fn access_control(req: AccessControlRequest) -> Result<(), LockupError> {
     {
         // Vesting account (uninitialized).
         {
-            let vesting = Vesting::unpack(&vesting_acc_info.try_borrow_data()?)?;
+            let mut data: &[u8] = &vesting_acc_info.try_borrow_data()?;
+            let vesting = Vesting::unpack_unchecked(&mut data)?;
 
             if vesting_acc_info.owner != program_id {
                 return Err(LockupErrorCode::NotOwnedByProgram)?;
@@ -197,7 +198,6 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), LockupError> {
     // Now transfer SPL funds from the depositor, to the
     // program-controlled vault.
     {
-        info!("invoke SPL token transfer");
         let deposit_instruction = spl_token::instruction::transfer(
             &spl_token::ID,
             depositor_acc_info.key,
@@ -217,8 +217,6 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), LockupError> {
             &[],
         )?;
     }
-
-    info!("state-transition: complete");
 
     Ok(())
 }
