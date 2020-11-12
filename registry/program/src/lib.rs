@@ -7,7 +7,7 @@ use solana_sdk::account_info::AccountInfo;
 use solana_sdk::entrypoint::ProgramResult;
 use solana_sdk::pubkey::Pubkey;
 
-//mod assign_vesting;
+mod assign_vesting;
 mod common;
 mod create_entity;
 mod create_member;
@@ -85,7 +85,7 @@ fn entry(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8])
         RegistryInstruction::EndStakeWithdrawal => {
             end_stake_withdrawal::handler(program_id, accounts)
         }
-        //        RegistryInstruction::AssignVesting => assign_vesting::handler(program_id, accounts),
+        RegistryInstruction::AssignVesting => assign_vesting::handler(program_id, accounts),
         RegistryInstruction::Slash { amount } => slash::handler(program_id, accounts, amount),
     };
 

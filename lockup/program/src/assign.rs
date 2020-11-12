@@ -71,7 +71,11 @@ fn access_control(req: AccessControlRequest) -> Result<(), LockupError> {
                 return Err(LockupErrorCode::AssignmentAuthMismatch)?;
             }
             // Auhtenticate the given beneficiary.
-            let seeds: &[&[u8]] = &[beneficiary.as_ref(), &[needs_assignment.nonce]];
+            let seeds: &[&[u8]] = &[
+                needs_assignment.identifier.as_ref(),
+                beneficiary.as_ref(),
+                &[needs_assignment.nonce],
+            ];
             let program_derived_address =
                 Pubkey::create_program_address(seeds, &needs_assignment.program_id)
                     .map_err(|_| LockupErrorCode::InvalidAccount)?;

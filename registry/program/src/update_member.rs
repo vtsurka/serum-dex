@@ -56,7 +56,7 @@ fn access_control(req: AccessControlRequest) -> Result<(), RegistryError> {
 
     // UpdateMember specific.
     if delegate.is_some() {
-        // Can't overwrite the delegate if it has funds in use.
+        // Can't overwrite the delegate if we haven't returned it's deposit.
         if !member.balances.delegate.is_empty() {
             return Err(RegistryErrorCode::DelegateInUse)?;
         }

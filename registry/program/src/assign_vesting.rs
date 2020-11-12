@@ -30,6 +30,7 @@ pub fn handler(program_id: &Pubkey, accounts: &[AccountInfo]) -> Result<(), Regi
 
     state_transition(StateTransitionRequest {
         member,
+        member_acc_info,
         vesting_acc_info,
         lockup_program_acc_info,
         safe_acc_info,
@@ -56,7 +57,7 @@ fn access_control(req: AccessControlRequest) -> Result<AccessControlResponse, Re
     access_control::entity(entity_acc_info, registrar_acc_info, program_id)?;
     let member = access_control::member_raw(member_acc_info, entity_acc_info, program_id)?;
 
-    // EndStakeWithdrawal specific.
+    // Assign specific.
     if !member.balances.stake_is_empty() {
         return Err(RegistryErrorCode::StakeNotEmpty)?;
     }
@@ -70,6 +71,7 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), RegistryError> {
 
     let StateTransitionRequest {
         member,
+        member_acc_info,
         lockup_program_acc_info,
         vesting_acc_info,
         safe_acc_info,
@@ -94,7 +96,11 @@ fn state_transition(req: StateTransitionRequest) -> Result<(), RegistryError> {
             data,
         }
     };
-    let signer_seeds = &[member.beneficiary.as_ref(), &[member.nonce]];
+    let signer_seeds = &[
+        member_acc_info.key.as_ref(),
+        member.beneficiary.as_ref(),
+        &[member.nonce],
+    ];
     solana_sdk::program::invoke_signed(
         &assign_instr,
         &[
@@ -121,6 +127,7 @@ struct AccessControlResponse {
 
 struct StateTransitionRequest<'a, 'b> {
     member: Member,
+    member_acc_info: &'a AccountInfo<'b>,
     lockup_program_acc_info: &'a AccountInfo<'b>,
     vesting_acc_info: &'a AccountInfo<'b>,
     safe_acc_info: &'a AccountInfo<'b>,

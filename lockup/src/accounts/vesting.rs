@@ -9,17 +9,6 @@ lazy_static::lazy_static! {
                 .expect("Vesting has a fixed size");
 }
 
-/// The Vesting account represents a single deposit of tokens
-/// available for withdrawal over a period of time determined by
-/// a vesting schedule.
-///
-/// There are three steps to this vesting account becoming available.
-/// It must be
-///
-/// 1. Initialized with a deposit (by anyone).
-/// 2. Marked claimable by a claim authority (e.g. staking program).
-/// 3. Claimed by the Vesting beneficiary.
-///
 #[derive(Default, Debug, BorshSerialize, BorshDeserialize, BorshSchema)]
 pub struct Vesting {
     /// True iff the vesting account has been initialized via deposit.
@@ -27,14 +16,14 @@ pub struct Vesting {
     /// If Some, defines the key whose signature is required to invoke the
     /// `Assign` instruction.
     ///
-    /// This is used for the registry program to set a beneficiary
-    /// for a locked SRM vesting account upon stake withdrawal. Although
-    /// rewards can be dropped on the pool at any time, it's desired for
-    /// locked SRM rewards to be unattainable until stake is fully withdrawn.
+    /// This is used so that the attainment of locked SRM requires a two
+    /// step process. 1) the locked SRM vesting account needs to be allocated
+    /// and 2) it needs to be assigned to a beneficiary.
     ///
-    /// This mechanism allows us to not only create a locked SRM vesting
-    /// account, but also for that vesting account to be unusable *and*
-    /// unassignable until the stake is withdrawn.
+    /// For example, the registry program uses this to assign a locked SRM
+    /// vesting account to a beneficiary as soon as all stake is withdrawn.
+    ///
+    /// If None, the beneficiary is fixed and the Vesting account can be used.
     pub needs_assignment: Option<NeedsAssignment>,
     /// One time token for claiming the vesting account.
     pub claimed: bool,
@@ -72,6 +61,9 @@ pub struct NeedsAssignment {
     pub authority: Pubkey,
     // Program id for the authority.
     pub program_id: Pubkey,
+    // Account identifier, e.g., the address of the `Member` account that
+    // earned the staking reward.
+    pub identifier: Pubkey,
     // Nonce for the authority.
     pub nonce: u8,
 }
@@ -185,6 +177,7 @@ mod tests {
             locked_nft_mint,
             whitelist_owned,
             locked_nft_token,
+            needs_assignment: None,
         };
 
         // When I pack it into a slice.
@@ -234,6 +227,7 @@ mod tests {
             end_ts,
             period_count,
             locked_nft_token,
+            needs_assignment: None,
         };
         assert_eq!(0, vesting_acc.available_for_withdrawal(10));
         assert_eq!(0, vesting_acc.available_for_withdrawal(11));
